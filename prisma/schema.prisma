@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  listings      Listing[]
+  reviewsGiven  Review[]  @relation("reviewer")
+  reviewsReceived Review[] @relation("reviewed")
+  sentMessages     Message[] @relation("sender")
+  receivedMessages Message[] @relation("receiver")
+  conversations   ConversationParticipant[]
+  stripeCustomerId String?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Listing {
+  id          String        @id @default(cuid())
+  title       String
+  description String        @db.Text
+  category    ServiceCategory
+  price       Float
+  priceType   PriceType     @default(HOURLY)
+  city        String
+  zipCode     String
+  lat         Float?
+  lng         Float?
+  image       String?
+  status      ListingStatus @default(PENDING)
+  stripePaymentId String?
+  featured    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews     Review[]
+  tags        String[]
+
+  avgRating   Float?
+  reviewCount Int           @default(0)
+
+  @@index([category])
+  @@index([city])
+  @@index([zipCode])
+  @@index([status])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  rating     Int      // 1-5
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  listingId  String
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User     @relation("reviewer", fields: [reviewerId], references: [id])
+  reviewedId String
+  reviewed   User     @relation("reviewed", fields: [reviewedId], references: [id])
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+  listingId    String?
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  userId         String
+  conversationId String
+  user           User         @relation(fields: [userId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  @@unique([userId, conversationId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+  read           Boolean      @default(false)
+  senderId       String
+  receiverId     String
+  conversationId String
+  sender         User         @relation("sender", fields: [senderId], references: [id])
+  receiver       User         @relation("receiver", fields: [receiverId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ServiceCategory {
+  LAWN_CARE
+  CLEANING
+  HANDYMAN
+  PET_CARE
+  CHILDCARE
+  TUTORING
+  MOVING
+  PAINTING
+  PLUMBING
+  ELECTRICAL
+  CARPENTRY
+  AUTO
+  TECH_SUPPORT
+  PERSONAL_TRAINING
+  COOKING
+  ERRANDS
+  OTHER
+}
+
+enum PriceType {
+  HOURLY
+  FLAT
+  STARTING_AT
+}
+
+enum ListingStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+}
