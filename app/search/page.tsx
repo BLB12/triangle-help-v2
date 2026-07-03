@@ -11,6 +11,7 @@ interface SearchParams {
   maxPrice?: string;
   minRating?: string;
   sort?: string;
+  [key: string]: string | undefined;
 }
 
 async function searchListings(params: SearchParams) {
@@ -47,28 +48,31 @@ async function searchListings(params: SearchParams) {
   });
 }
 
-export default async function SearchPage({ searchParams }: { searchParams: SearchParams }) {
-  const listings = await searchListings(searchParams);
-  const hasQuery = Object.values(searchParams).some(Boolean);
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const resolvedParams = await searchParams;
+  const listings = await searchListings(resolvedParams);
+  const hasQuery = Object.values(resolvedParams).some(Boolean);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">
-          {searchParams.q ? `Results for "${searchParams.q}"` :
-           searchParams.category ? CATEGORIES.find(c => c.value === searchParams.category)?.label ?? "Services" :
+          {resolvedParams.q ? `Results for "${resolvedParams.q}"` :
+           resolvedParams.category ? CATEGORIES.find(c => c.value === resolvedParams.category)?.label ?? "Services" :
            "All Services"}
         </h1>
         <p className="text-neutral-500 text-sm mt-1">{listings.length} service{listings.length !== 1 ? "s" : ""} found</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar filters */}
         <aside className="w-full lg:w-64 shrink-0">
-          <SearchFilters currentParams={searchParams} />
+          <SearchFilters currentParams={resolvedParams} />
         </aside>
 
-        {/* Results */}
         <div className="flex-1">
           {listings.length === 0 ? (
             <div className="card p-12 text-center">
