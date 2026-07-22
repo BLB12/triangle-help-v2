@@ -26,6 +26,7 @@ model User {
   sentMessages     Message[] @relation("sender")
   receivedMessages Message[] @relation("receiver")
   conversations   ConversationParticipant[]
+  activityLogs    ActivityLog[]
   stripeCustomerId String?
 }
 
@@ -88,7 +89,7 @@ model Listing {
 
 model Review {
   id         String   @id @default(cuid())
-  rating     Int      // 1-5
+  rating     Int
   comment    String?  @db.Text
   createdAt  DateTime @default(now())
 
@@ -129,6 +130,19 @@ model Message {
   sender         User         @relation("sender", fields: [senderId], references: [id])
   receiver       User         @relation("receiver", fields: [receiverId], references: [id])
   conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 enum Role {
