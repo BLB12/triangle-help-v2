@@ -4,14 +4,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/utils";
-import { CreditCard, CheckCircle } from "lucide-react";
+import { CreditCard, ChevronDown } from "lucide-react";
 
 export default function NewListingPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [step, setStep] = useState(1); // 1: form, 2: payment
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showMore, setShowMore] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -21,6 +21,9 @@ export default function NewListingPage() {
     priceType: "HOURLY",
     city: "",
     zipCode: "",
+    website: "",
+    foundingYear: "",
+    exactAddress: "",
   });
 
   function update(key: string, val: string) {
@@ -33,7 +36,6 @@ export default function NewListingPage() {
     setLoading(true);
     setError("");
 
-    // Create listing, then redirect to Stripe
     const res = await fetch("/api/listings", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,7 +45,6 @@ export default function NewListingPage() {
     const data = await res.json();
     if (!res.ok) { setError(data.error ?? "Failed to create listing."); setLoading(false); return; }
 
-    // Redirect to Stripe Checkout
     const stripeRes = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -73,18 +74,17 @@ export default function NewListingPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
+    <div className="max-w-2xl mx-auto px-4 py-24">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">List Your Service</h1>
+        <h1 className="font-display text-2xl font-semibold">List Your Service</h1>
         <p className="text-neutral-500 text-sm mt-1">One-time listing fee of $9.99. Your service goes live after payment.</p>
       </div>
 
-      {/* Fee callout */}
-      <div className="bg-brand-50 border border-brand-100 rounded-2xl p-4 mb-6 flex items-center gap-3">
+      <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 rounded-2xl p-4 mb-6 flex items-center gap-3">
         <CreditCard size={20} className="text-brand-600 shrink-0" />
         <div>
-          <p className="text-sm font-medium text-brand-800">$9.99 listing fee</p>
-          <p className="text-xs text-brand-600">Paid securely via Stripe after filling out your listing info.</p>
+          <p className="text-sm font-medium text-brand-800 dark:text-brand-200">$9.99 listing fee</p>
+          <p className="text-xs text-brand-600 dark:text-brand-400">Paid securely via Stripe after filling out your listing info.</p>
         </div>
       </div>
 
@@ -137,6 +137,38 @@ export default function NewListingPage() {
             <label className="label">ZIP code</label>
             <input className="input" placeholder="27601" value={form.zipCode} onChange={(e) => update("zipCode", e.target.value)} required />
           </div>
+        </div>
+
+        {/* ADDITIONAL DETAILS DROPDOWN */}
+        <div className="border-t border-neutral-200 dark:border-neutral-800 pt-5">
+          <button
+            type="button"
+            onClick={() => setShowMore((v) => !v)}
+            className="flex items-center justify-between w-full text-sm font-medium text-neutral-600 dark:text-neutral-300"
+          >
+            Additional details (optional)
+            <ChevronDown size={16} className={`transition-transform ${showMore ? "rotate-180" : ""}`} />
+          </button>
+
+          {showMore && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="label">Website</label>
+                <input className="input" type="url" placeholder="https://yourbusiness.com" value={form.website} onChange={(e) => update("website", e.target.value)} />
+              </div>
+
+              <div>
+                <label className="label">Founding year</label>
+                <input className="input" type="number" placeholder="2018" min="1900" max={new Date().getFullYear()} value={form.foundingYear} onChange={(e) => update("foundingYear", e.target.value)} />
+              </div>
+
+              <div>
+                <label className="label">Exact business location</label>
+                <input className="input" placeholder="123 Main St, Raleigh, NC 27601" value={form.exactAddress} onChange={(e) => update("exactAddress", e.target.value)} />
+                <p className="text-xs text-neutral-400 mt-1">Only shown to customers after they contact you — not public on the listing.</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">

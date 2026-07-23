@@ -78,6 +78,9 @@ model Listing {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviews     Review[]
   tags        String[]
+  website     String?
+  foundingYear Int?
+  exactAddress String?
 
   avgRating   Float?
   reviewCount Int           @default(0)

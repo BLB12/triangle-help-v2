@@ -11,6 +11,9 @@ const schema = z.object({
   priceType: z.enum(["HOURLY", "FLAT", "STARTING_AT"]),
   city: z.string().min(2),
   zipCode: z.string().min(5),
+  website: z.string().url().optional().or(z.literal("")),
+  foundingYear: z.coerce.number().int().min(1900).max(new Date().getFullYear()).optional(),
+  exactAddress: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -21,12 +24,15 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid input", details: parsed.error.flatten() }, { status: 400 });
 
+  const { website, ...rest } = parsed.data;
+
   const listing = await prisma.listing.create({
     data: {
-      ...parsed.data,
+      ...rest,
+      website: website || undefined,
       category: parsed.data.category as any,
       userId: session.user.id,
-      status: "PENDING", // becomes ACTIVE after Stripe payment
+      status: "PENDING",
     },
   });
 
