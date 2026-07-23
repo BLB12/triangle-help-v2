@@ -427,4 +427,4 @@ export default async function ListingPage({
       </div>
 
     </div>
-  );
+  );}
