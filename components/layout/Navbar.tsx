@@ -1,118 +1,343 @@
 "use client";
+
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
-import { Menu, X, MessageSquare, PlusCircle, Search, Shield, Settings } from "lucide-react";
+
+import {
+  Menu,
+  X,
+  Search,
+  MessageSquare,
+  Plus,
+  Shield,
+  Settings,
+} from "lucide-react";
+
 
 export function Navbar() {
+
   const { data: session } = useSession();
-  const [open, setOpen] = useState(false);
-  const isAdmin = (session?.user as any)?.role === "ADMIN";
+  const [open,setOpen] = useState(false);
+
+  const isAdmin =
+    (session?.user as any)?.role === "ADMIN";
+
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-neutral-200 shadow-sm dark:bg-neutral-950 dark:border-neutral-800">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center dark:shadow-glow">
-            <span className="text-neutral-950 font-bold text-sm">TH</span>
-          </div>
-          <span className="font-display font-semibold text-neutral-900 text-lg hidden sm:block dark:text-neutral-100">
-            Triangle Help
-          </span>
-        </Link>
 
-        {/* Center search shortcut */}
-        <Link
-          href="/search"
-          className="hidden md:flex items-center gap-2 text-sm text-neutral-500 bg-neutral-100 hover:bg-neutral-200 px-4 py-2 rounded-xl transition-colors dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800"
-        >
-          <Search size={15} />
-          Search services near you...
-        </Link>
+    <header className="
+      fixed
+      top-0
+      left-0
+      right-0
+      z-50
+      px-5
+      pt-5
+    ">
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-3">
-          {session ? (
-            <>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-1.5 text-brand-600 hover:text-brand-500 transition-colors text-sm font-medium dark:text-brand-400"
-                >
-                  <Shield size={15} /> Admin
-                </Link>
-              )}
-              <Link href="/messages" className="text-neutral-600 hover:text-brand-600 transition-colors p-2 dark:text-neutral-400 dark:hover:text-brand-400">
-                <MessageSquare size={20} />
-              </Link>
-              <Link href="/account" className="text-neutral-600 hover:text-brand-600 transition-colors p-2 dark:text-neutral-400 dark:hover:text-brand-400">
-                <Settings size={20} />
-              </Link>
-              <Link href="/dashboard" className="text-neutral-600 hover:text-brand-600 transition-colors text-sm font-medium dark:text-neutral-400 dark:hover:text-brand-400">
-                Dashboard
-              </Link>
-              <Link href="/listings/new" className="btn-primary">
-                <PlusCircle size={16} /> List a Service
-              </Link>
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="text-neutral-500 hover:text-neutral-800 transition-colors p-2 dark:text-neutral-400 dark:hover:text-neutral-100"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="btn-secondary">Sign In</Link>
-              <Link href="/listings/new" className="btn-primary">
-                <PlusCircle size={16} /> List a Service
-              </Link>
-            </>
-          )}
-        </div>
 
-        {/* Mobile menu toggle */}
-        <button
-          className="md:hidden p-2 text-neutral-600 dark:text-neutral-300"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
+      <nav className="
+        max-w-6xl
+        mx-auto
+        rounded-full
+        border
+        border-black/5
+        dark:border-white/10
+        bg-white/70
+        dark:bg-black/50
+        backdrop-blur-2xl
+        shadow-[0_10px_40px_rgba(0,0,0,.08)]
+      ">
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden bg-white border-t border-neutral-100 px-4 py-4 flex flex-col gap-3 dark:bg-neutral-950 dark:border-neutral-800">
-          <Link href="/search" className="flex items-center gap-2 text-sm py-2 dark:text-neutral-200" onClick={() => setOpen(false)}>
-            <Search size={16} /> Search Services
+
+        <div className="
+          h-16
+          px-6
+          flex
+          items-center
+          justify-between
+        ">
+
+
+
+          {/* LOGO */}
+
+          <Link
+            href="/"
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
+
+            <div className="
+              w-9
+              h-9
+              rounded-2xl
+              bg-green-600
+              flex
+              items-center
+              justify-center
+              text-white
+              font-semibold
+            ">
+
+              TH
+
+            </div>
+
+
+
+            <span className="
+              font-semibold
+              tracking-tight
+            ">
+
+              Triangle Help
+
+            </span>
+
+
           </Link>
+
+
+
+
+
+
+          {/* CENTER SEARCH */}
+
+          <Link
+            href="/search"
+            className="
+              hidden
+              md:flex
+              items-center
+              gap-3
+              px-5
+              py-2.5
+              rounded-full
+              bg-neutral-100
+              dark:bg-neutral-900
+              text-neutral-500
+              hover:bg-neutral-200
+              dark:hover:bg-neutral-800
+              transition
+            "
+          >
+
+            <Search size={16}/>
+
+
+            <span className="
+              text-sm
+            ">
+
+              Ask for help...
+
+            </span>
+
+
+            <kbd className="
+              hidden
+              lg:block
+              px-2
+              py-1
+              rounded-md
+              bg-white
+              dark:bg-black
+              text-xs
+            ">
+
+              ⌘ K
+
+            </kbd>
+
+
+          </Link>
+
+
+
+
+
+
+
+          {/* ACTIONS */}
+
+          <div className="
+            hidden
+            md:flex
+            items-center
+            gap-2
+          ">
+
+
           {session ? (
+
             <>
-              {isAdmin && (
-                <Link href="/admin" className="flex items-center gap-2 text-sm py-2 text-brand-600 dark:text-brand-400" onClick={() => setOpen(false)}>
-                  <Shield size={16} /> Admin
-                </Link>
-              )}
-              <Link href="/dashboard" className="text-sm py-2 dark:text-neutral-200" onClick={() => setOpen(false)}>Dashboard</Link>
-              <Link href="/messages" className="text-sm py-2 dark:text-neutral-200" onClick={() => setOpen(false)}>Messages</Link>
-              <Link href="/account" className="text-sm py-2 dark:text-neutral-200" onClick={() => setOpen(false)}>Account settings</Link>
-              <Link href="/listings/new" className="btn-primary w-full justify-center" onClick={() => setOpen(false)}>
-                List a Service
+
+
+            {isAdmin && (
+
+              <Link
+                href="/admin"
+                className="
+                  text-orange-500
+                  p-2
+                "
+              >
+
+                <Shield size={18}/>
+
               </Link>
-              <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm text-neutral-500 py-2 text-left dark:text-neutral-400">
-                Sign Out
-              </button>
+
+            )}
+
+
+
+            <Link
+              href="/messages"
+              className="
+                p-2.5
+                rounded-full
+                hover:bg-neutral-100
+                dark:hover:bg-neutral-900
+              "
+            >
+
+              <MessageSquare size={19}/>
+
+            </Link>
+
+
+
+
+            <Link
+              href="/account"
+              className="
+                p-2.5
+                rounded-full
+                hover:bg-neutral-100
+                dark:hover:bg-neutral-900
+              "
+            >
+
+              <Settings size={19}/>
+
+            </Link>
+
+
+
+
+            <Link
+              href="/listings/new"
+              className="
+                flex
+                items-center
+                gap-2
+                px-5
+                py-2.5
+                rounded-full
+                bg-green-600
+                text-white
+                text-sm
+                font-medium
+                hover:bg-green-500
+                transition
+              "
+            >
+
+              <Plus size={16}/>
+
+              Create
+
+            </Link>
+
+
+
             </>
+
+
           ) : (
+
             <>
-              <Link href="/login" className="btn-secondary w-full justify-center" onClick={() => setOpen(false)}>Sign In</Link>
-              <Link href="/signup" className="btn-secondary w-full justify-center" onClick={() => setOpen(false)}>Create Account</Link>
-              <Link href="/listings/new" className="btn-primary w-full justify-center" onClick={() => setOpen(false)}>List a Service</Link>
+
+
+              <Link
+                href="/login"
+                className="
+                  text-sm
+                  px-4
+                  py-2
+                "
+              >
+
+                Sign in
+
+              </Link>
+
+
+
+              <Link
+                href="/listings/new"
+                className="
+                  px-5
+                  py-2.5
+                  rounded-full
+                  bg-green-600
+                  text-white
+                  text-sm
+                  font-medium
+                "
+              >
+
+                Get started
+
+              </Link>
+
+
             </>
+
+
           )}
+
+
+          </div>
+
+
+
+
+
+
+
+          {/* MOBILE */}
+
+          <button
+            onClick={()=>setOpen(!open)}
+            className="
+              md:hidden
+              p-2
+            "
+          >
+
+            {open ? <X/> : <Menu/>}
+
+
+          </button>
+
+
+
         </div>
-      )}
-    </nav>
+
+
+
+      </nav>
+
+
+    </header>
+
   );
+
 }

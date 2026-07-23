@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>triangle-help — UI concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FAFAF8;
+    --card: #FFFFFF;
+    --ink: #1B231F;
+    --pine: #2F5233;
+    --pine-dark: #1F3A23;
+    --brick: #A64B2A;
+    --sage: #75796F;
+    --line: #E1DFD4;
+    --radius: 3px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{ font-family:'Space Grotesk', sans-serif; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  .app{ max-width: 960px; margin:0 auto; padding: 0 24px 80px; }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 28px 0 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand{ display:flex; align-items:baseline; gap:10px; }
+  .brand-mark{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--brick); letter-spacing: 0.08em;
+    border: 1px solid var(--brick); border-radius: var(--radius);
+    padding: 2px 6px;
+  }
+  .brand-name{ font-size: 19px; font-weight:600; letter-spacing:-0.01em; }
+  .topbar-loc{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sage); }
+
+  .tabs{
+    display:flex; gap: 2px; margin-top: 18px;
+  }
+  .tab{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing:0.04em;
+    color: var(--sage);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-bottom: none;
+    padding: 9px 16px;
+    cursor:pointer;
+    border-radius: var(--radius) var(--radius) 0 0;
+    transition: color .15s ease, background .15s ease;
+  }
+  .tab.active{
+    color: var(--ink);
+    background: var(--card);
+    border-color: var(--line);
+    position:relative;
+  }
+  .tab:not(.active):hover{ color: var(--ink); }
+
+  .panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: none;
+    padding: 48px 40px;
+    min-height: 460px;
+  }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--brick); letter-spacing:0.08em;
+    margin-bottom: 14px;
+  }
+  h1.hero{
+    font-size: 42px; line-height:1.08; font-weight:600; letter-spacing:-0.015em;
+    margin: 0 0 18px;
+    max-width: 11ch;
+  }
+  .hero-sub{
+    color: var(--sage); font-size:15px; line-height:1.6; max-width: 46ch; margin: 0 0 32px;
+  }
+  .lookup{
+    display:flex; border:1px solid var(--ink); border-radius: var(--radius); overflow:hidden;
+    max-width: 480px;
+  }
+  .lookup input{
+    flex:1; border:none; padding: 14px 16px; font-family:'JetBrains Mono', monospace; font-size:13px;
+    background: var(--bg); color:var(--ink); outline:none;
+  }
+  .lookup input::placeholder{ color:#A3A79B; }
+  .lookup button{
+    border:none; background: var(--pine); color:#fff; padding: 0 22px;
+    font-family:'Inter'; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .lookup button:hover{ background: var(--pine-dark); }
+
+  .cat-grid{
+    margin-top: 48px;
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;
+  }
+  .cat-chip{
+    font-family:'JetBrains Mono', monospace; font-size: 12px; color: var(--ink);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+    cursor:default; transition: border-color .15s ease;
+  }
+  .cat-chip:hover{ border-color: var(--pine); }
+  .cat-chip span.n{ color: var(--sage); }
+
+  .browse-head{
+    display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px;
+  }
+  h2.section-title{ font-size:22px; font-weight:600; letter-spacing:-0.01em; margin:0; }
+  .result-count{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sage); }
+
+  .listing-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--line); border:1px solid var(--line);
+  }
+  .listing-card{
+    background:var(--card); padding: 22px;
+  }
+  .listing-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .listing-tag{
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px; color:var(--pine);
+    border:1px solid var(--pine); border-radius: var(--radius); padding:3px 7px; letter-spacing:0.03em;
+  }
+  .listing-price{ font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--ink); font-weight:500; }
+  .listing-title{ font-size:16px; font-weight:600; margin: 0 0 6px; letter-spacing:-0.005em; }
+  .listing-loc{ font-size:13px; color:var(--sage); margin:0 0 14px; }
+  .listing-rating{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--brick); }
+
+  .acct-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:48px; }
+  .field-group{ margin-bottom:22px; }
+  label{ display:block; font-size:12px; color:var(--sage); margin-bottom:7px; font-weight:500; }
+  input.field{
+    width:100%; padding: 11px 13px; border:1px solid var(--line); border-radius:var(--radius);
+    font-family:'Inter'; font-size:14px; background:var(--bg); color:var(--ink); outline:none;
+  }
+  input.field:focus{ border-color: var(--pine); }
+  .btn-primary{
+    background:var(--pine); color:#fff; border:none; border-radius:var(--radius);
+    padding: 11px 20px; font-size:14px; font-weight:600; cursor:pointer; margin-top:6px;
+  }
+  .btn-primary:hover{ background:var(--pine-dark); }
+
+  .log-title{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sage); margin: 0 0 14px; letter-spacing:0.05em; }
+  .log-entry{
+    display:flex; gap:14px; padding: 11px 0; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .log-entry:last-child{ border-bottom:none; }
+  .log-time{ font-family:'JetBrains Mono', monospace; color:var(--sage); font-size:11.5px; white-space:nowrap; padding-top:1px; }
+  .log-action{ color:var(--ink); }
+
+  @media (max-width: 640px){
+    .listing-grid{ grid-template-columns: 1fr; }
+    .acct-grid{ grid-template-columns: 1fr; }
+    .cat-grid{ grid-template-columns: 1fr 1fr; }
+    h1.hero{ font-size:32px; }
+    .panel{ padding: 32px 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="brand-mark">△</span>
+      <span class="brand-name display">triangle-help</span>
+    </div>
+    <div class="topbar-loc">RALEIGH · DURHAM · CHAPEL HILL</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-screen="home">[ 01 ] HOME</button>
+    <button class="tab" data-screen="browse">[ 02 ] BROWSE</button>
+    <button class="tab" data-screen="account">[ 03 ] ACCOUNT</button>
+  </div>
+
+  <div class="panel">
+
+    <div class="screen active" id="home">
+      <div class="eyebrow">LOCAL SERVICES, VERIFIED NEIGHBORS</div>
+      <h1 class="hero display">Find trusted help around the Triangle.</h1>
+      <p class="hero-sub">Lawn care, cleaning, tutoring, repairs — posted by people who live down the street, not a call center three states away.</p>
+      <div class="lookup">
+        <input type="text" placeholder="what do you need help with?" />
+        <button>Search</button>
+      </div>
+
+      <div class="cat-grid">
+        <div class="cat-chip">LAWN_CARE <span class="n">42</span></div>
+        <div class="cat-chip">CLEANING <span class="n">65</span></div>
+        <div class="cat-chip">HANDYMAN <span class="n">38</span></div>
+        <div class="cat-chip">PET_CARE <span class="n">51</span></div>
+        <div class="cat-chip">TUTORING <span class="n">29</span></div>
+        <div class="cat-chip">MOVING <span class="n">17</span></div>
+      </div>
+    </div>
+
+    <div class="screen" id="browse">
+      <div class="browse-head">
+        <h2 class="section-title display">Browse listings</h2>
+        <div class="result-count">142 RESULTS</div>
+      </div>
+      <div class="listing-grid">
+        <div class="listing-card">
+          <div class="listing-top">
+            <span class="listing-tag">LAWN_CARE</span>
+            <span class="listing-price">$45/hr</span>
+          </div>
+          <p class="listing-title">Weekly mowing &amp; edging</p>
+          <p class="listing-loc">Cary, NC · 27511</p>
+          <span class="listing-rating">★ 4.9 (31)</span>
+        </div>
+        <div class="listing-card">
+          <div class="listing-top">
+            <span class="listing-tag">TUTORING</span>
+            <span class="listing-price">$30/hr</span>
+          </div>
+          <p class="listing-title">Algebra &amp; SAT math prep</p>
+          <p class="listing-loc">Durham, NC · 27701</p>
+          <span class="listing-rating">★ 5.0 (18)</span>
+        </div>
+        <div class="listing-card">
+          <div class="listing-top">
+            <span class="listing-tag">HANDYMAN</span>
+            <span class="listing-price">from $75</span>
+          </div>
+          <p class="listing-title">Drywall patch &amp; paint touch-up</p>
+          <p class="listing-loc">Raleigh, NC · 27604</p>
+          <span class="listing-rating">★ 4.7 (12)</span>
+        </div>
+        <div class="listing-card">
+          <div class="listing-top">
+            <span class="listing-tag">PET_CARE</span>
+            <span class="listing-price">$25/visit</span>
+          </div>
+          <p class="listing-title">Dog walking, weekday mornings</p>
+          <p class="listing-loc">Chapel Hill, NC · 27514</p>
+          <span class="listing-rating">★ 4.8 (44)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen" id="account">
+      <h2 class="section-title display" style="margin-bottom:32px;">Account</h2>
+      <div class="acct-grid">
+        <div>
+          <div class="field-group">
+            <label>Name</label>
+            <input class="field" type="text" value="Bryan Beggs" />
+          </div>
+          <div class="field-group">
+            <label>Email</label>
+            <input class="field" type="email" value="bbeggs@example.com" />
+          </div>
+          <button class="btn-primary">Save changes</button>
+
+          <div class="field-group" style="margin-top:32px;">
+            <label>New password</label>
+            <input class="field" type="password" placeholder="••••••••" />
+          </div>
+          <button class="btn-primary" style="background:var(--ink);">Update password</button>
+        </div>
+
+        <div>
+          <div class="log-title">ACTIVITY LOG</div>
+          <div class="log-entry">
+            <span class="log-time mono">07/23 09:14</span>
+            <span class="log-action">Signed in</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time mono">07/22 18:02</span>
+            <span class="log-action">Updated profile name</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time mono">07/21 08:41</span>
+            <span class="log-action">Signed in</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time mono">07/19 14:55</span>
+            <span class="log-action">Password changed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.screen).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

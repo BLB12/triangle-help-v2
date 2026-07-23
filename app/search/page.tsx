@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { SearchFilters } from "@/components/filters/SearchFilters";
 import { ListingCard } from "@/components/listings/ListingCard";
-import { CATEGORIES } from "@/lib/utils";
+import { SearchFilters } from "@/components/filters/SearchFilters";
+import { Search, Sparkles } from "lucide-react";
 
 interface SearchParams {
   q?: string;
@@ -11,84 +11,367 @@ interface SearchParams {
   maxPrice?: string;
   minRating?: string;
   sort?: string;
-  [key: string]: string | undefined;
 }
+
 
 async function searchListings(params: SearchParams) {
-  const where: any = { status: "ACTIVE" };
 
-  if (params.q) {
+  const where:any = {
+    status:"ACTIVE",
+  };
+
+
+  if(params.q){
+
     where.OR = [
-      { title: { contains: params.q, mode: "insensitive" } },
-      { description: { contains: params.q, mode: "insensitive" } },
+      {
+        title:{
+          contains:params.q,
+          mode:"insensitive",
+        },
+      },
+      {
+        description:{
+          contains:params.q,
+          mode:"insensitive",
+        },
+      },
     ];
-  }
-  if (params.category) where.category = params.category;
-  if (params.city) where.city = { contains: params.city, mode: "insensitive" };
-  if (params.minPrice || params.maxPrice) {
-    where.price = {};
-    if (params.minPrice) where.price.gte = parseFloat(params.minPrice);
-    if (params.maxPrice) where.price.lte = parseFloat(params.maxPrice);
-  }
-  if (params.minRating) {
-    where.avgRating = { gte: parseFloat(params.minRating) };
+
   }
 
-  const orderBy: any =
-    params.sort === "price_asc" ? { price: "asc" } :
-    params.sort === "price_desc" ? { price: "desc" } :
-    params.sort === "rating" ? { avgRating: "desc" } :
-    { createdAt: "desc" };
+
+
+  if(params.category)
+    where.category=params.category;
+
+
+
+  if(params.city){
+
+    where.city={
+      contains:params.city,
+      mode:"insensitive",
+    };
+
+  }
+
+
+
+  if(params.minPrice || params.maxPrice){
+
+    where.price={};
+
+
+    if(params.minPrice)
+      where.price.gte =
+        Number(params.minPrice);
+
+
+    if(params.maxPrice)
+      where.price.lte =
+        Number(params.maxPrice);
+
+  }
+
+
+
+  if(params.minRating){
+
+    where.avgRating={
+      gte:Number(params.minRating),
+    };
+
+  }
+
+
 
   return prisma.listing.findMany({
+
     where,
-    include: { user: { select: { name: true, image: true } } },
-    orderBy,
-    take: 50,
+
+    include:{
+      user:{
+        select:{
+          name:true,
+          image:true,
+        },
+      },
+    },
+
+
+    orderBy:{
+      createdAt:"desc",
+    },
+
+
+    take:50,
+
   });
+
 }
 
+
+
+
+
 export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const resolvedParams = await searchParams;
-  const listings = await searchListings(resolvedParams);
-  const hasQuery = Object.values(resolvedParams).some(Boolean);
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          {resolvedParams.q ? `Results for "${resolvedParams.q}"` :
-           resolvedParams.category ? CATEGORIES.find(c => c.value === resolvedParams.category)?.label ?? "Services" :
-           "All Services"}
-        </h1>
-        <p className="text-neutral-500 text-sm mt-1">{listings.length} service{listings.length !== 1 ? "s" : ""} found</p>
-      </div>
+searchParams,
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <aside className="w-full lg:w-64 shrink-0">
-          <SearchFilters currentParams={resolvedParams} />
-        </aside>
+}:{
+searchParams:Promise<SearchParams>
+}){
 
-        <div className="flex-1">
-          {listings.length === 0 ? (
-            <div className="card p-12 text-center">
-              <div className="text-4xl mb-4">🔍</div>
-              <h3 className="font-semibold text-lg mb-2">No services found</h3>
-              <p className="text-neutral-500 text-sm">Try adjusting your filters or search terms.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-              {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing as any} />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+
+const params = await searchParams;
+
+const listings =
+await searchListings(params);
+
+
+
+return (
+
+<main className="
+min-h-screen
+px-6
+py-24
+">
+
+
+
+<div className="
+max-w-7xl
+mx-auto
+">
+
+
+
+
+
+
+{/* HEADER */}
+
+
+<section className="
+text-center
+mb-14
+">
+
+
+<div className="
+inline-flex
+items-center
+gap-2
+text-green-600
+mb-5
+">
+
+<Sparkles size={18}/>
+
+Smart discovery
+
+</div>
+
+
+
+<h1 className="
+text-5xl
+font-semibold
+tracking-tight
+">
+
+Find the right person.
+
+</h1>
+
+
+
+<p className="
+mt-4
+text-neutral-500
+text-lg
+">
+
+Trusted help from your local community.
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+
+{/* SEARCH CONTROLS */}
+
+
+<div className="
+mb-12
+">
+
+<SearchFilters
+currentParams={params}
+/>
+
+
+</div>
+
+
+
+
+
+
+
+
+{/* RESULTS */}
+
+
+
+<div className="
+flex
+items-center
+justify-between
+mb-8
+">
+
+
+<div>
+
+<h2 className="
+text-3xl
+font-semibold
+">
+
+Results
+
+</h2>
+
+
+<p className="
+text-neutral-500
+mt-1
+">
+
+{listings.length} people available
+
+</p>
+
+
+</div>
+
+
+
+<div className="
+flex
+items-center
+gap-2
+text-neutral-400
+">
+
+<Search size={18}/>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{listings.length === 0 ? (
+
+
+<div className="
+rounded-[40px]
+p-20
+text-center
+bg-neutral-100
+dark:bg-neutral-900
+">
+
+
+<div className="
+text-5xl
+mb-5
+">
+
+🔍
+
+</div>
+
+
+<h3 className="
+text-2xl
+font-semibold
+">
+
+Nothing found
+
+</h3>
+
+
+<p className="
+mt-3
+text-neutral-500
+">
+
+Try adjusting your search.
+
+</p>
+
+
+</div>
+
+
+
+):(
+
+
+<div className="
+grid
+md:grid-cols-2
+xl:grid-cols-3
+gap-8
+">
+
+
+{listings.map((listing)=>(
+
+
+<ListingCard
+key={listing.id}
+listing={listing as any}
+/>
+
+
+))}
+
+
+</div>
+
+
+)}
+
+
+
+
+</div>
+
+
+</main>
+
+);
+
+
 }

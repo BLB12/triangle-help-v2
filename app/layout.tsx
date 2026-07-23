@@ -4,8 +4,12 @@ import { SessionProvider } from "@/components/layout/SessionProvider";
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Triangle Help",
-  description: "Find trusted local help across the Triangle.",
+  title: {
+    default: "Triangle Help",
+    template: "%s | Triangle Help",
+  },
+  description:
+    "Discover trusted local services and neighbors across Raleigh, Durham, and Chapel Hill.",
 };
 
 export default function RootLayout({
@@ -15,10 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="font-sans antialiased bg-background text-neutral-900 dark:text-neutral-50 selection:bg-brand-500/30">
         <SessionProvider>
           <Navbar />
-          {children}
+          <div className="min-h-screen overflow-hidden">{children}</div>
         </SessionProvider>
       </body>
     </html>

@@ -2,90 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-
-  --background:#ffffff;
-  --foreground:#09090B;
-
-  --card:#f8fafc;
-  --border:#e2e8f0;
-
+  --background: #FAFAF8;
+  --card: #FFFFFF;
+  --border: #E1DFD4;
 }
-
 
 .dark {
-
-  --background:#111418;
-  --foreground:#FAFAFA;
-
-  --card:#151A21;
-  --border:#334155;
-
+  --background: #11150F;
+  --card: #1B231F;
+  --border: #3A3D38;
 }
-
 
 body {
-
-background:var(--background);
-
-color:var(--foreground);
-
+  background-color: var(--background);
+  color: #1B231F;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+.dark body {
+  color: #FAFAF8;
 }
 
-/* Selection */
-::selection {
-  background: #39FF14;
-  color: #000000;
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  background-color: #2F5233;
+  color: white;
+  font-weight: 600;
+  transition: background-color .15s ease;
 }
-
-::-webkit-scrollbar-track {
-  background: #09090B;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #27272A;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #39FF14;
-}
-
-@layer components {
-
-  .btn-primary {
-    @apply bg-primary text-black font-bold px-5 py-3 rounded-xl transition-all duration-200;
-  }
-
-  .btn-primary:hover {
-    box-shadow: 0 0 30px rgba(57,255,20,.35);
-    transform: translateY(-2px);
-  }
-
-
-  .btn-secondary {
-    @apply border border-border text-white px-5 py-3 rounded-xl transition-all duration-200;
-  }
-
-  .btn-secondary:hover {
-    @apply border-primary text-primary;
-  }
-
-
-  .glass {
-    background: rgba(21,26,33,.85);
-    backdrop-filter: blur(20px);
-    border:1px solid #27272A;
-  }
-
+.btn-primary:hover {
+  background-color: #1F3A23;
 }

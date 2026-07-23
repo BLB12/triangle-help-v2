@@ -1,13 +1,24 @@
 import Link from "next/link";
-import { Search, Star, Shield, Zap, ArrowRight, MapPin } from "lucide-react";
+import {
+  Search,
+  Star,
+  Shield,
+  ArrowRight,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
+
 import { prisma } from "@/lib/prisma";
 import { ListingCard } from "@/components/listings/ListingCard";
-import { CATEGORIES, formatCategory } from "@/lib/utils";
+import { SmartSearch } from "@/components/search/SmartSearch";
+import { CATEGORIES } from "@/lib/utils";
 
 async function getFeaturedListings() {
   return prisma.listing.findMany({
     where: { status: "ACTIVE" },
-    include: { user: { select: { name: true, image: true } } },
+    include: {
+      user: { select: { name: true, image: true } },
+    },
     orderBy: [{ featured: "desc" }, { avgRating: "desc" }],
     take: 6,
   });
@@ -17,39 +28,49 @@ export default async function HomePage() {
   const listings = await getFeaturedListings();
 
   return (
-    <div>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-600 to-brand-800 text-white py-20 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-brand-500/40 text-brand-100 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-            <MapPin size={14} /> Serving Raleigh, Durham & Chapel Hill
+    <main className="overflow-hidden">
+      {/* HERO */}
+      <section className="relative px-6 pt-32 pb-20 text-center">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-500/15 via-transparent to-transparent" />
+
+        <div className="max-w-6xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-sm mb-10">
+            <MapPin size={15} />
+            Triangle Region
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold leading-tight mb-4">
-            Neighbors helping neighbors in the Triangle
+
+          <h1 className="font-display text-6xl md:text-8xl font-semibold tracking-[-0.03em] leading-[0.95]">
+            Local help.
+            <br />
+            <span className="text-brand-600 dark:text-brand-300">Reimagined.</span>
           </h1>
-          <p className="text-brand-100 text-lg mb-8 max-w-xl mx-auto">
-            Find trusted local helpers for lawn care, cleaning, handyman work, and more — or list your own services and start earning.
+
+          <p className="max-w-2xl mx-auto mt-8 text-xl text-neutral-500 leading-relaxed">
+            Find trusted people for anything you need, or turn your skills
+            into opportunities.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/search" className="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-semibold px-7 py-3.5 rounded-xl hover:bg-brand-50 transition-colors text-base">
-              <Search size={18} /> Find Help
-            </Link>
-            <Link href="/listings/new" className="inline-flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-400 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors text-base border border-brand-400">
-              Offer Your Services <ArrowRight size={18} />
-            </Link>
+
+          <div className="mt-12">
+            <SmartSearch />
           </div>
         </div>
       </section>
 
-      {/* Category pills */}
-      <section className="max-w-6xl mx-auto px-4 py-10">
-        <h2 className="text-xl font-semibold mb-4">Browse by category</h2>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
+      {/* DISCOVER */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="flex items-center gap-3 mb-8">
+          <Sparkles size={22} className="text-brand-600 dark:text-brand-300" />
+          <h2 className="font-display text-3xl font-semibold tracking-tight">
+            Explore possibilities
+          </h2>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {CATEGORIES.slice(0, 10).map((cat) => (
             <Link
               key={cat.value}
               href={`/search?category=${cat.value}`}
-              className="px-4 py-2 rounded-full bg-white border border-neutral-200 text-sm font-medium text-neutral-700 hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50 transition-colors"
+              className="px-6 py-3 rounded-full bg-neutral-100 dark:bg-neutral-800 hover:bg-brand-600 hover:text-white transition text-sm font-mono"
             >
               {cat.label}
             </Link>
@@ -57,16 +78,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured listings */}
+      {/* FEATURED */}
       {listings.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 pb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Featured services</h2>
-            <Link href="/search" className="text-sm text-brand-600 hover:underline font-medium">
-              View all →
+        <section className="max-w-7xl mx-auto px-6 py-20">
+          <div className="flex justify-between items-end mb-10">
+            <div>
+              <p className="text-accent-500 text-sm font-mono mb-2">
+                TRUSTED PROVIDERS
+              </p>
+              <h2 className="font-display text-4xl font-semibold">
+                People nearby
+              </h2>
+            </div>
+
+            <Link
+              href="/search"
+              className="text-brand-600 dark:text-brand-300 flex items-center gap-2"
+            >
+              View all
+              <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing as any} />
             ))}
@@ -74,38 +108,39 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* How it works */}
-      <section className="bg-white border-t border-neutral-100 py-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-12">How Triangle Help works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { icon: <Search size={24} />, title: "Search & Filter", desc: "Browse hundreds of local services. Filter by category, distance, rating, and price to find exactly what you need." },
-              { icon: <Shield size={24} />, title: "Connect Safely", desc: "Message service providers directly through our platform. Read reviews from your neighbors before you hire." },
-              { icon: <Zap size={24} />, title: "Get It Done", desc: "Agree on the details, get the job done, and leave a review to help your community." },
-            ].map((item) => (
-              <div key={item.title} className="text-center">
-                <div className="w-12 h-12 bg-brand-100 text-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  {item.icon}
-                </div>
-                <h3 className="font-semibold mb-2">{item.title}</h3>
-                <p className="text-neutral-500 text-sm leading-relaxed">{item.desc}</p>
+      {/* TRUST */}
+      <section className="py-32 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-16 text-center">
+          {[
+            { icon: <Search size={30} />, title: "Discover", text: "Find people who fit your needs." },
+            { icon: <Shield size={30} />, title: "Connect", text: "Communicate with confidence." },
+            { icon: <Star size={30} />, title: "Trust", text: "Real reviews from your community." },
+          ].map((item) => (
+            <div key={item.title}>
+              <div className="mx-auto mb-6 w-16 h-16 rounded-3xl bg-brand-500/10 text-brand-600 dark:text-brand-300 flex items-center justify-center">
+                {item.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="font-display text-2xl font-semibold mb-3">
+                {item.title}
+              </h3>
+              <p className="text-neutral-500">{item.text}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-brand-50 border-t border-brand-100 py-16 px-4 text-center">
-        <h2 className="text-2xl font-bold mb-3">Ready to offer your services?</h2>
-        <p className="text-neutral-600 mb-6 max-w-md mx-auto">
-          List your service for just $9.99 and start connecting with neighbors who need your help.
-        </p>
-        <Link href="/listings/new" className="btn-primary text-base px-8 py-3">
-          Get Started — $9.99
+      {/* FINAL */}
+      <section className="py-32 text-center">
+        <h2 className="font-display text-5xl font-semibold tracking-tight">
+          Your community.
+          <br />
+          Connected.
+        </h2>
+
+        <Link href="/listings/new" className="btn-primary inline-flex mt-10">
+          Offer your skills
         </Link>
       </section>
-    </div>
+    </main>
   );
 }
